@@ -1,0 +1,7 @@
+browser->server: https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+server-->browser: {"message":"note created"}
+
+note over browser:
+browser executes a handler that appends
+note from the response to the note list
+end note
