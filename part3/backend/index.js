@@ -92,4 +92,5 @@ app.get("/api/info", (request, response) => {
   );
 });
 
-app.listen(3002);
+// https://stackoverflow.com/questions/15693192/heroku-node-js-error-web-process-failed-to-bind-to-port-within-60-seconds-of
+app.listen(process.env.PORT || 3002);
