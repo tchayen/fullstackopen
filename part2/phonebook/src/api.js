@@ -15,7 +15,7 @@ const update = (id, person) => {
   return axios.put(`${url}/${id}`, person);
 };
 
-const _delete = (id) => {
+const _delete = async (id) => {
   return axios.delete(`${url}/${id}`);
 };
 
