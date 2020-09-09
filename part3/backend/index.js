@@ -8,7 +8,7 @@ const app = express();
 app.use(express.static("build"));
 app.use(cors());
 app.use(express.json());
-morgan.token("body", (req, res) => JSON.stringify(req.body));
+morgan.token("body", (req) => JSON.stringify(req.body));
 app.use(morgan(":method :url :status :response-time ms :body"));
 
 app.get("/api/persons", async (request, response) => {
@@ -36,9 +36,9 @@ app.get("/api/persons/:id", async (request, response) => {
   response.status(404).end();
 });
 
-app.delete("/api/persons/:id", async (request, response) => {
+app.delete("/api/persons/:id", async (request, response, next) => {
   Person.findByIdAndRemove(request.params["id"])
-    .then((result) => {
+    .then(() => {
       response.status(204).end();
     })
     .catch((error) => next(error));

@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "buildui": "rm -rf ./build;cd ../phonebook;yarn build;cp -r build ../backend",
-    "deploy": "git subtree push --prefix part3/backend heroku master",
+    "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Tomasz Czajęcki",
@@ -20,5 +20,8 @@
     "mongoose-unique-validator": "^2.0.3",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^7.8.1"
   }
 }
