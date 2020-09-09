@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
+const Preview = ({ country }) => (
+  <div>
+    <h2>{country.name}</h2>
+    <p>capital {country.capital}</p>
+    <p>population {country.population}</p>
+    <h3>Languages</h3>
+    <ul>
+      {country.languages.map((language) => (
+        <li key={language.iso639_1}>{language.name}</li>
+      ))}
+    </ul>
+  </div>
+);
+
 const App = () => {
   const [countries, setCountries] = useState([]);
 
@@ -21,7 +35,7 @@ const App = () => {
   console.log(countries);
 
   const matching = countries.filter((country) =>
-    country.name.toLocaleLowerCase().match(value)
+    country.name.toLocaleLowerCase().match(value.toLocaleLowerCase())
   );
 
   return (
@@ -30,20 +44,13 @@ const App = () => {
       {matching.length > 10 ? (
         <div>Too many matches. Specify different filter.</div>
       ) : matching.length === 1 ? (
-        <div>
-          <h2>{matching[0].name}</h2>
-          <p>capital {matching[0].capital}</p>
-          <p>population {matching[0].population}</p>
-          <h3>Languages</h3>
-          <ul>
-            {matching[0].languages.map((language) => (
-              <li key={language.iso639_1}>{language.name}</li>
-            ))}
-          </ul>
-        </div>
+        <Preview country={matching[0]} />
       ) : (
         matching.map((country) => (
-          <div key={country.alpha3Code}>{country.name}</div>
+          <div key={country.alpha3Code}>
+            {country.name}{" "}
+            <button onClick={() => setValue(country.name)}>show</button>
+          </div>
         ))
       )}
     </div>
