@@ -55,8 +55,13 @@ app.post("/api/persons", async (request, response) => {
     response.status(400).json({ message: "The name is missing" });
   }
 
-  const input = new Person(person);
-  await input.save();
+  try {
+    const input = new Person(person);
+    await input.save();
+  } catch (error) {
+    response.status(400).json(error.message);
+  }
+
   response.status(200).end();
 });
 

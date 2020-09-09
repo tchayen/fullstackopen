@@ -58,11 +58,11 @@ const List = ({ persons, filter, onDelete, setError }) => (
   </>
 );
 
-const Form = ({ persons, fetchPersons, setNotice }) => {
+const Form = ({ persons, fetchPersons, setError, setNotice }) => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
     const newPerson = { name: newName, number: newNumber };
 
@@ -72,15 +72,24 @@ const Form = ({ persons, fetchPersons, setNotice }) => {
         `${newName} is already added to the phonebook. Replace the old number with a new one?`
       );
 
-      api.update(persons[id].id, newPerson).then(fetchPersons);
+      await api.update(persons[id].id, newPerson);
+      await fetchPersons();
       setNotice(`${newPerson.name} was updated.`);
       return;
     }
 
-    api.create(newPerson).then(fetchPersons);
-    setNotice(`${newPerson.name} was added.`);
+    try {
+      await api.create(newPerson);
+    } catch (error) {
+      setError(error.response.data);
+      return;
+    }
+
     setNewName("");
     setNewNumber("");
+
+    setNotice(`${newPerson.name} was added.`);
+    await fetchPersons();
   };
 
   const onNameChange = (event) => {
@@ -130,12 +139,14 @@ const App = () => {
   };
 
   const fetchPersons = () => {
-    api.all().then((persons) => {
+    return api.all().then((persons) => {
       setPersons(persons);
     });
   };
 
-  useEffect(fetchPersons, []);
+  useEffect(() => {
+    fetchPersons();
+  }, []);
 
   const onDelete = fetchPersons;
 
@@ -149,6 +160,7 @@ const App = () => {
         persons={persons}
         fetchPersons={fetchPersons}
         setNotice={setNotice}
+        setError={setError}
       />
       <h2>Numbers</h2>
       <List
