@@ -7,6 +7,13 @@ const App = () => {
 
   const onSubmit = (event) => {
     event.preventDefault();
+
+    const id = persons.findIndex((person) => person.name === newName);
+    if (id !== -1) {
+      alert(`${newName} is already added to the phonebook`);
+      return;
+    }
+
     setPersons([...persons, { name: newName }]);
     setNewName("");
   };
