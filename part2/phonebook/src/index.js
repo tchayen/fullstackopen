@@ -14,35 +14,55 @@ const Filter = ({ setFilter }) => {
   );
 };
 
-const List = ({ persons, filter }) => (
+const Person = ({ person, onDelete }) => {
+  const onClick = () => {
+    if (!window.confirm(`Delete ${person.name}?`)) {
+      return;
+    }
+
+    api.delete(person.id).then(() => onDelete());
+  };
+
+  return (
+    <p>
+      {person.name} {person.number} <button onClick={onClick}>delete</button>
+    </p>
+  );
+};
+
+const List = ({ persons, filter, onDelete }) => (
   <>
     {persons
       .filter((person) => person.name.toLocaleLowerCase().match(filter || ""))
       .map((person, index) => (
-        <p key={`${person.name}-${index}`}>
-          {person.name} {person.phone}
-        </p>
+        <Person
+          key={`${person.name}-${index}`}
+          person={person}
+          onDelete={onDelete}
+        />
       ))}
   </>
 );
 
-const Form = ({ persons, setPersons }) => {
+const Form = ({ persons, fetchPersons }) => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
 
   const onSubmit = (event) => {
     event.preventDefault();
+    const newPerson = { name: newName, number: newNumber };
 
     const id = persons.findIndex((person) => person.name === newName);
     if (id !== -1) {
-      alert(`${newName} is already added to the phonebook`);
+      window.confirm(
+        `${newName} is already added to the phonebook. Replace the old number with a new one?`
+      );
+
+      api.update(persons[id].id, newPerson).then(fetchPersons);
       return;
     }
 
-    const newPerson = { name: newName, phone: newNumber };
-
-    api.create(newPerson);
-    setPersons([...persons, newPerson]);
+    api.create(newPerson).then(fetchPersons);
     setNewName("");
     setNewNumber("");
   };
@@ -76,20 +96,24 @@ const App = () => {
   const [persons, setPersons] = useState([]);
   const [filter, setFilter] = useState("");
 
-  useEffect(() => {
+  const fetchPersons = () => {
     api.all().then((persons) => {
       setPersons(persons);
     });
-  }, []);
+  };
+
+  useEffect(fetchPersons, []);
+
+  const onDelete = fetchPersons;
 
   return (
     <div>
       <h2>Phonebook</h2>
       <Filter filter={filter} setFilter={setFilter} />
       <h2>Add a new number</h2>
-      <Form persons={persons} setPersons={setPersons} />
+      <Form persons={persons} fetchPersons={fetchPersons} />
       <h2>Numbers</h2>
-      <List persons={persons} filter={filter} />
+      <List persons={persons} filter={filter} onDelete={onDelete} />
     </div>
   );
 };
