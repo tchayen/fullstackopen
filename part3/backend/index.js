@@ -86,6 +86,11 @@ app.post("/api/persons", async (request, response) => {
   response.status(200).end();
 });
 
+app.put("/api/persons/:id", async (request, response) => {
+  await Person.findByIdAndUpdate(request.params.id, request.body);
+  response.status(200).end();
+});
+
 app.get("/api/info", (request, response) => {
   response.send(
     `Phonebook has info for ${
