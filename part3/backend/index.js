@@ -66,7 +66,7 @@ app.delete("/api/persons/:id", (request, response) => {
   response.status(404).end();
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", async (request, response) => {
   const person = request.body;
 
   if (!person.number) {
@@ -77,13 +77,15 @@ app.post("/api/persons", (request, response) => {
     response.status(400).json({ message: "The name is missing" });
   }
 
-  if (db.persons.find((existing) => existing.name === person.name)) {
-    response
-      .status(400)
-      .json({ message: "Person with given name already exists" });
-  }
+  // if (db.persons.find((existing) => existing.name === person.name)) {
+  //   response
+  //     .status(400)
+  //     .json({ message: "Person with given name already exists" });
+  // }
 
-  db.persons.push({ ...person, id: Math.random() * Number.MAX_SAFE_INTEGER });
+  const input = new Person(person);
+  await input.save();
+  // db.persons.push({ ...person, id: Math.random() * Number.MAX_SAFE_INTEGER });
   response.status(200).end();
 });
 
