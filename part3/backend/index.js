@@ -1,7 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 morgan.token("body", (req, res) => JSON.stringify(req.body));
 app.use(morgan(":method :url :status :response-time ms :body"));
@@ -31,11 +33,11 @@ const db = {
   ],
 };
 
-app.get("/api/notes", (request, response) => {
-  response.json(db);
+app.get("/api/persons", (request, response) => {
+  response.json(db.persons);
 });
 
-app.get("/api/notes/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response) => {
   const person = db.persons.find(
     (person) => person.id === Number(request.params["id"])
   );
@@ -47,7 +49,7 @@ app.get("/api/notes/:id", (request, response) => {
   response.status(404).end();
 });
 
-app.delete("/api/notes/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response) => {
   const id = db.persons.findIndex(
     (person) => person.id === Number(request.params["id"])
   );
@@ -60,7 +62,7 @@ app.delete("/api/notes/:id", (request, response) => {
   response.status(404).end();
 });
 
-app.post("/api/notes", (request, response) => {
+app.post("/api/persons", (request, response) => {
   const person = request.body;
 
   if (!person.number) {

@@ -1,0 +1,71 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 32px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+button {
+  background-color: #4583c3;
+  color: #fff;
+  border: none;
+  height: 32px;
+  padding-left: 16px;
+  padding-right: 16px;
+  font-weight: 700;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #34699d;
+}
+
+button:active {
+  background-color: #25496e;
+}
+
+button:focus,
+button:active,
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(69, 131, 195, 0.3);
+}
+
+input {
+  height: 32px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+input:focus {
+  border-color: #4583c3;
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  padding: 24px;
+  background-color: #b1d4f2;
+  color: #162738;
+}
+
+.error {
+  /* Ugly hack so I don't have to look for matching red-ish colors */
+  filter: hue-rotate(120deg);
+}
