@@ -1,6 +1,7 @@
 const express = require("express");
 
 const app = express();
+app.use(express.json());
 
 const db = {
   persons: [
@@ -54,6 +55,13 @@ app.delete("/api/notes/:id", (request, response) => {
   }
 
   response.status(404).end();
+});
+
+app.post("/api/notes", (request, response) => {
+  const person = request.body;
+  console.log(request.body);
+  db.persons.push({ ...person, id: Math.random() * Number.MAX_SAFE_INTEGER });
+  response.status(200).end();
 });
 
 app.get("/api/info", (request, response) => {
