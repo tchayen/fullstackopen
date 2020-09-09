@@ -8,6 +8,10 @@ const App = () => {
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
 
+  const weightedSum = good * 1 + neutral * 0 + bad * -1;
+  const totalCount = good + neutral + bad;
+  const average = weightedSum / totalCount;
+
   return (
     <div>
       <h1>Give Feedback</h1>
@@ -15,11 +19,18 @@ const App = () => {
       <button onClick={() => setNeutral(neutral + 1)}>neutral</button>
       <button onClick={() => setBad(bad + 1)}>bad</button>
       <h2>Statistics</h2>
-      good {good}
+      <strong>{good}</strong> good opinions
       <br />
-      neutral {neutral}
+      <strong>{neutral}</strong> neutral opinions
       <br />
-      bad {bad}
+      <strong>{bad}</strong> bad opinions
+      <br />
+      <strong>{good + neutral + bad}</strong> opinions in total
+      <br />
+      <strong>{(average || 0).toFixed(2)}</strong> on average
+      <br />
+      <strong>{((good / totalCount) * 100 || 0).toFixed(2)}%</strong> were
+      positive
       <br />
     </div>
   );
