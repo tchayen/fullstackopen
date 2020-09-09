@@ -78,7 +78,7 @@ const App = () => {
         setPersons(data);
       });
     });
-  });
+  }, []);
 
   return (
     <div>
