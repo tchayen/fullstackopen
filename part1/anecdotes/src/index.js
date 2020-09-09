@@ -7,10 +7,18 @@ const App = (props) => {
   const [selected, setSelected] = useState(0);
   const [votes, setVotes] = useState({});
 
+  const sortedByVotes = Object.entries(votes)
+    .sort((a, b) => b[1] - a[1])
+    .map(([id]) => Number(id));
+
+  console.log(sortedByVotes);
+
   return (
     <div>
       <p>{props.anecdotes[selected]}</p>
-      <p>{votes[selected] || 0} votes</p>
+      <p>
+        <strong>{votes[selected] || 0}</strong> votes
+      </p>
       <button
         onClick={() =>
           setVotes({ ...votes, [selected]: (votes[selected] || 0) + 1 })
@@ -25,6 +33,16 @@ const App = (props) => {
       >
         Next anecdote
       </button>
+      {sortedByVotes.length > 0 && (
+        <>
+          <h2>Anecdote with most votes</h2>
+          <p>
+            {props.anecdotes[sortedByVotes[0]]}
+            <br />
+            has <strong>{votes[sortedByVotes[0]]}</strong> votes
+          </p>
+        </>
+      )}
     </div>
   );
 };
