@@ -11,43 +11,26 @@ app.use(express.json());
 morgan.token("body", (req, res) => JSON.stringify(req.body));
 app.use(morgan(":method :url :status :response-time ms :body"));
 
-const db = {
-  persons: [
-    {
-      name: "Arto Hellas",
-      number: "040-123456",
-      id: 1,
-    },
-    {
-      name: "Ada Lovelace",
-      number: "39-44-5323523",
-      id: 2,
-    },
-    {
-      name: "Dan Abramov",
-      number: "12-43-234345",
-      id: 3,
-    },
-    {
-      name: "Mary Poppendieck",
-      number: "39-23-6423122",
-      id: 4,
-    },
-  ],
-};
-
 app.get("/api/persons", async (request, response) => {
   const people = await Person.find({});
-  response.json(people);
+  response.json(
+    people.map((person) => ({
+      id: person._id,
+      name: person.name,
+      number: person.number,
+    }))
+  );
 });
 
-app.get("/api/persons/:id", (request, response) => {
-  const person = db.persons.find(
-    (person) => person.id === Number(request.params["id"])
-  );
+app.get("/api/persons/:id", async (request, response) => {
+  const person = await Person.findById(request.params["id"]);
 
   if (person) {
-    response.json(person);
+    response.json({
+      id: person._id,
+      name: person.name,
+      number: person.number,
+    });
   }
 
   response.status(404).end();
@@ -59,8 +42,6 @@ app.delete("/api/persons/:id", async (request, response) => {
       response.status(204).end();
     })
     .catch((error) => next(error));
-
-  // response.status(404).end();
 });
 
 app.post("/api/persons", async (request, response) => {
@@ -74,15 +55,8 @@ app.post("/api/persons", async (request, response) => {
     response.status(400).json({ message: "The name is missing" });
   }
 
-  // if (db.persons.find((existing) => existing.name === person.name)) {
-  //   response
-  //     .status(400)
-  //     .json({ message: "Person with given name already exists" });
-  // }
-
   const input = new Person(person);
   await input.save();
-  // db.persons.push({ ...person, id: Math.random() * Number.MAX_SAFE_INTEGER });
   response.status(200).end();
 });
 
@@ -91,11 +65,10 @@ app.put("/api/persons/:id", async (request, response) => {
   response.status(200).end();
 });
 
-app.get("/api/info", (request, response) => {
+app.get("/api/info", async (request, response) => {
+  const count = await Person.count({});
   response.send(
-    `Phonebook has info for ${
-      db.persons.length
-    } people\n\n${new Date().toISOString()}`
+    `Phonebook has info for ${count} people\n\n${new Date().toISOString()}`
   );
 });
 
