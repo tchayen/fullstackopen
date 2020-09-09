@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
+import axios from "axios";
+
+const url = "http://localhost:3001/persons";
+
+const api = {
+  all: async () => {
+    const response = await axios.get(url);
+    return response.data;
+  },
+  create: (person) => {
+    return axios.post(url, person);
+  },
+  update: (id, person) => {
+    return axios.put(`${url}/${id}`, person);
+  },
+};
 
 const Filter = ({ setFilter }) => {
   const onFilterChange = (event) => {
@@ -38,7 +54,10 @@ const Form = ({ persons, setPersons }) => {
       return;
     }
 
-    setPersons([...persons, { name: newName, phone: newNumber }]);
+    const newPerson = { name: newName, phone: newNumber };
+
+    api.create(newPerson);
+    setPersons([...persons, newPerson]);
     setNewName("");
     setNewNumber("");
   };
@@ -73,10 +92,8 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3001/persons").then((response) => {
-      response.json().then((data) => {
-        setPersons(data);
-      });
+    api.all().then((persons) => {
+      setPersons(persons);
     });
   }, []);
 
