@@ -43,6 +43,19 @@ app.get("/api/notes/:id", (request, response) => {
   response.status(404).end();
 });
 
+app.delete("/api/notes/:id", (request, response) => {
+  const id = db.persons.findIndex(
+    (person) => person.id === Number(request.params["id"])
+  );
+
+  if (id !== -1) {
+    db.persons.splice(id, 1);
+    response.status(200).end();
+  }
+
+  response.status(404).end();
+});
+
 app.get("/api/info", (request, response) => {
   response.send(
     `Phonebook has info for ${
