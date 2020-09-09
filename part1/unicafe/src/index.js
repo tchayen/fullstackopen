@@ -4,10 +4,12 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 const Statistic = ({ text, value }) => (
-  <>
-    <strong>{value}</strong> {text}
-    <br />
-  </>
+  <tr>
+    <td>{text}</td>
+    <td>
+      <strong>{value}</strong>
+    </td>
+  </tr>
 );
 
 const Statistics = ({ good, neutral, bad }) => {
@@ -27,15 +29,19 @@ const Statistics = ({ good, neutral, bad }) => {
   return (
     <div>
       <h2>Statistics</h2>
-      <Statistic value={good} text="good opinions" />
-      <Statistic value={neutral} text="neutral opinions" />
-      <Statistic value={bad} text="bad opinions" />
-      <Statistic value={totalCount} text="opinions in total" />
-      <Statistic value={average.toFixed(2)} text="on average" />
-      <Statistic
-        value={`${((good / totalCount) * 100).toFixed(2)}%`}
-        text="were positive"
-      />
+      <table>
+        <tbody>
+          <Statistic value={good} text="good" />
+          <Statistic value={neutral} text="neutral" />
+          <Statistic value={bad} text="bad" />
+          <Statistic value={totalCount} text="all" />
+          <Statistic value={average.toFixed(2)} text="average" />
+          <Statistic
+            value={`${((good / totalCount) * 100).toFixed(2)}%`}
+            text="positive"
+          />
+        </tbody>
+      </table>
     </div>
   );
 };
