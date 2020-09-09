@@ -21,8 +21,10 @@ const Part = ({ part, numberOfExercises }) => (
 
 const Total = ({ parts }) => (
   <p>
-    Number of exercises{" "}
-    {parts.map((part) => part.exercises).reduce((a, b) => a + b)}
+    <strong>
+      Number of exercises{" "}
+      {parts.map((part) => part.exercises).reduce((a, b) => a + b)}
+    </strong>
   </p>
 );
 
