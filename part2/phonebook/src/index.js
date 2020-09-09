@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 
-const Filter = ({ filter, setFilter }) => {
+const Filter = ({ setFilter }) => {
   const onFilterChange = (event) => {
     setFilter(event.target.value);
   };
@@ -69,13 +69,16 @@ const Form = ({ persons, setPersons }) => {
 };
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456" },
-    { name: "Ada Lovelace", number: "39-44-5323523" },
-    { name: "Dan Abramov", number: "12-43-234345" },
-    { name: "Mary Poppendieck", number: "39-23-6423122" },
-  ]);
+  const [persons, setPersons] = useState([]);
   const [filter, setFilter] = useState("");
+
+  useEffect(() => {
+    fetch("http://localhost:3001/persons").then((response) => {
+      response.json().then((data) => {
+        setPersons(data);
+      });
+    });
+  });
 
   return (
     <div>
