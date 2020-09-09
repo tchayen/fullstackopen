@@ -5,10 +5,19 @@ import "./index.css";
 
 const App = (props) => {
   const [selected, setSelected] = useState(0);
+  const [votes, setVotes] = useState({});
 
   return (
     <div>
       <p>{props.anecdotes[selected]}</p>
+      <p>{votes[selected] || 0} votes</p>
+      <button
+        onClick={() =>
+          setVotes({ ...votes, [selected]: (votes[selected] || 0) + 1 })
+        }
+      >
+        Vote
+      </button>
       <button
         onClick={() =>
           setSelected(Math.floor(Math.random() * anecdotes.length))
