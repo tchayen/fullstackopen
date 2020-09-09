@@ -28,7 +28,7 @@ const Person = ({ person, onDelete, setError }) => {
     }
 
     try {
-      await api.delete(person.id).then(() => onDelete());
+      await api.delete(person._id).then(() => onDelete());
     } catch (error) {
       setError(
         `Information about ${person.name} doesn't exist on the server (already?).`
@@ -72,7 +72,7 @@ const Form = ({ persons, fetchPersons, setNotice }) => {
         `${newName} is already added to the phonebook. Replace the old number with a new one?`
       );
 
-      api.update(persons[id].id, newPerson).then(fetchPersons);
+      api.update(persons[id]._id, newPerson).then(fetchPersons);
       setNotice(`${newPerson.name} was updated.`);
       return;
     }

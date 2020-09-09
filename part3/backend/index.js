@@ -53,17 +53,14 @@ app.get("/api/persons/:id", (request, response) => {
   response.status(404).end();
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = db.persons.findIndex(
-    (person) => person.id === Number(request.params["id"])
-  );
+app.delete("/api/persons/:id", async (request, response) => {
+  Person.findByIdAndRemove(request.params["id"])
+    .then((result) => {
+      response.status(204).end();
+    })
+    .catch((error) => next(error));
 
-  if (id !== -1) {
-    db.persons.splice(id, 1);
-    response.status(200).end();
-  }
-
-  response.status(404).end();
+  // response.status(404).end();
 });
 
 app.post("/api/persons", async (request, response) => {
@@ -96,6 +93,18 @@ app.get("/api/info", (request, response) => {
     } people\n\n${new Date().toISOString()}`
   );
 });
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 // https://stackoverflow.com/questions/15693192/heroku-node-js-error-web-process-failed-to-bind-to-port-within-60-seconds-of
 app.listen(process.env.PORT || 3002);
