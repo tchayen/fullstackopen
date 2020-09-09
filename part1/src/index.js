@@ -6,13 +6,17 @@ import "./index.css";
 const Header = ({ course }) => <h1>{course}</h1>;
 
 const Content = ({ parts }) => (
-  <>
+  <div>
     {parts.map((part) => (
-      <p>
-        {part.name} {part.exercises}
-      </p>
+      <Part part={part.name} numberOfExercises={part.exercises} />
     ))}
-  </>
+  </div>
+);
+
+const Part = ({ part, numberOfExercises }) => (
+  <p>
+    {part} {numberOfExercises}
+  </p>
 );
 
 const Total = ({ numberOfExercises }) => (
