@@ -4,12 +4,21 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 const Statistics = ({ good, neutral, bad }) => {
-  const weightedSum = good * 1 + neutral * 0 + bad * -1;
   const totalCount = good + neutral + bad;
+
+  if (totalCount === 0) {
+    return (
+      <div>
+        <h2>Statistics</h2>No feedback given.
+      </div>
+    );
+  }
+
+  const weightedSum = good * 1 + neutral * 0 + bad * -1;
   const average = weightedSum / totalCount;
 
   return (
-    <>
+    <div>
       <h2>Statistics</h2>
       <strong>{good}</strong> good opinions
       <br />
@@ -19,11 +28,10 @@ const Statistics = ({ good, neutral, bad }) => {
       <br />
       <strong>{good + neutral + bad}</strong> opinions in total
       <br />
-      <strong>{(average || 0).toFixed(2)}</strong> on average
+      <strong>{average.toFixed(2)}</strong> on average
       <br />
-      <strong>{((good / totalCount) * 100 || 0).toFixed(2)}%</strong> were
-      positive
-    </>
+      <strong>{((good / totalCount) * 100).toFixed(2)}%</strong> were positive
+    </div>
   );
 };
 
