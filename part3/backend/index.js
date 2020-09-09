@@ -31,4 +31,24 @@ app.get("/api/notes", (request, response) => {
   response.json(db);
 });
 
+app.get("/api/notes/:id", (request, response) => {
+  const person = db.persons.find(
+    (person) => person.id === Number(request.params["id"])
+  );
+
+  if (person) {
+    response.json(person);
+  }
+
+  response.status(404).end();
+});
+
+app.get("/api/info", (request, response) => {
+  response.send(
+    `Phonebook has info for ${
+      db.persons.length
+    } people\n\n${new Date().toISOString()}`
+  );
+});
+
 app.listen(3002);
