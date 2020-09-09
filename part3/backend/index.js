@@ -1,6 +1,8 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const Person = require("./models/person");
 
 const app = express();
 app.use(express.static("build"));
@@ -34,8 +36,9 @@ const db = {
   ],
 };
 
-app.get("/api/persons", (request, response) => {
-  response.json(db.persons);
+app.get("/api/persons", async (request, response) => {
+  const people = await Person.find({});
+  response.json(people);
 });
 
 app.get("/api/persons/:id", (request, response) => {
