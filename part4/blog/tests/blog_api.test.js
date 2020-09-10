@@ -4,32 +4,45 @@ const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 
 const api = supertest(app);
+
+const initialUser = {
+  username: "test",
+  name: "John",
+  passwordHash: "---",
+};
 
 const initialBlogs = [
   {
     title: "First blog",
-    author: "Me",
     url: "http://localhost:1234/1-blog",
     likes: 5,
   },
   {
     title: "Next blog",
-    author: "John Doe",
     url: "http://localhost:1234/next-blog",
   },
   {
     title: "Other thing posted here",
-    author: "Me",
     url: "http://localhost:1234/other-thing-posted-here",
   },
 ];
 
+let user = null;
+beforeAll(async () => {
+  user = new User(initialUser);
+  await user.save();
+});
+
 beforeEach(async () => {
   await Blog.deleteMany({});
+
   await Promise.all(
-    initialBlogs.map((blog) => new Blog(blog)).map((blog) => blog.save())
+    initialBlogs
+      .map((blog) => new Blog({ ...blog, author: user.id }))
+      .map((blog) => blog.save())
   );
 });
 
@@ -61,7 +74,7 @@ describe("creating a post", () => {
   test("is possible", async () => {
     await api.post("/api/blogs").send({
       title: "New blog",
-      author: "Me",
+      author: user.id,
       url: "http://localhost:1234/new-blog",
     });
 
@@ -72,7 +85,7 @@ describe("creating a post", () => {
   test("and ommiting the like field makes it a default 0", async () => {
     const result = await api.post("/api/blogs").send({
       title: "New blog",
-      author: "Me",
+      author: user.id,
       url: "http://localhost:1234/new-blog",
     });
     const blog = result.body;
@@ -83,7 +96,7 @@ describe("creating a post", () => {
 
   test("and ommiting either title or URL gives response with HTTP 400", async () => {
     const result = await api.post("/api/blogs").send({
-      author: "Me",
+      author: user.id,
       url: "http://localhost:1234/new-blog",
     });
 
@@ -112,7 +125,7 @@ describe("updating a post", () => {
 
     const result = await api.put(`/api/blogs/${blogs[0].id}`).send({
       title: "First blog",
-      author: "Me",
+      author: user.id,
       url: "http://localhost:1234/1-blog",
       likes: 15,
     });
