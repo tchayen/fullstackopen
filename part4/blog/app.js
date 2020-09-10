@@ -5,6 +5,8 @@ require("express-async-errors");
 const cors = require("cors");
 const middleware = require("./utils/middleware");
 const blogs = require("./controllers/blogs");
+const users = require("./controllers/users");
+const login = require("./controllers/login");
 
 console.log("connecting to", config.MONGODB_URI);
 
@@ -27,7 +29,9 @@ app.use(express.static("build"));
 app.use(cors());
 app.use(express.json());
 app.use(middleware.logger);
-app.use(blogs);
+app.use("/api/blogs", blogs);
+app.use("/api/users", users);
+app.use("/api/login", login);
 app.use(middleware.errorHandler);
 
 module.exports = app;
