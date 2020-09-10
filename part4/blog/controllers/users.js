@@ -17,6 +17,14 @@ app.post("/", async (request, response) => {
   console.log(request.body);
   const passwordHash = await bcrypt.hash(request.body.password, saltRounds);
 
+  if (request.body.password.length < 3) {
+    response.status(400).json({ error: "Password is too short" });
+  }
+
+  if (request.body.username.length < 3) {
+    response.status(400).json({ error: "Username is too short" });
+  }
+
   const user = new User({
     username: request.body.username,
     name: request.body.name,
