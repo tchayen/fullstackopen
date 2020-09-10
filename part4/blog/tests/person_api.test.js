@@ -108,7 +108,6 @@ describe("updating a post", () => {
 
     const firstPost = await api.get(`/api/blogs/${blogs[0].id}`);
 
-    console.log(firstPost.body);
     expect(firstPost.body.likes).toBe(5);
 
     const result = await api.put(`/api/blogs/${blogs[0].id}`).send({
