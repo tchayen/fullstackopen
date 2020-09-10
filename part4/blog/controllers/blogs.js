@@ -42,7 +42,21 @@ app.put("/:id", async (request, response) => {
 });
 
 app.delete("/:id", async (request, response) => {
-  await Blog.findByIdAndRemove(request.params.id);
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
+
+  if (!request.token || !decodedToken.id) {
+    return response.status(401).json({ error: "Token missing or invalid" });
+  }
+
+  const blog = await Blog.findById(request.params.id);
+
+  if (blog.author.toString() !== decodedToken.id) {
+    return response
+      .status(401)
+      .json({ error: "You are not the author of this blog" });
+  }
+
+  await blog.remove();
   response.status(204).end();
 });
 
