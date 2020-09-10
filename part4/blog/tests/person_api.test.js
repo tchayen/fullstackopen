@@ -101,6 +101,27 @@ describe("removing a post", () => {
   });
 });
 
+describe("updating a post", () => {
+  test("properly increases number of likes", async () => {
+    const response = await api.get("/api/blogs");
+    const blogs = response.body;
+
+    const firstPost = await api.get(`/api/blogs/${blogs[0].id}`);
+
+    console.log(firstPost.body);
+    expect(firstPost.body.likes).toBe(5);
+
+    const result = await api.put(`/api/blogs/${blogs[0].id}`).send({
+      title: "First blog",
+      author: "Me",
+      url: "http://localhost:1234/1-blog",
+      likes: 15,
+    });
+
+    expect(result.body.likes).toBe(15);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
