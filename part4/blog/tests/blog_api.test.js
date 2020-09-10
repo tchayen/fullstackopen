@@ -32,8 +32,10 @@ const initialBlogs = [
 
 let user = null;
 beforeAll(async () => {
+  await User.deleteMany({});
   user = new User(initialUser);
   await user.save();
+  console.log(await User.find({}));
 });
 
 beforeEach(async () => {

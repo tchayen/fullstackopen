@@ -3,12 +3,20 @@ const app = require("express").Router();
 const User = require("../models/user");
 
 app.get("/", async (request, response) => {
-  const users = await User.find({});
+  const users = await User.find({}).populate("blogs", {
+    likes: 1,
+    title: 1,
+    url: 1,
+    id: 1,
+  });
   response.json(users);
 });
 
 app.get("/:id", async (request, response) => {
-  const user = await User.findById(request.params.id);
+  const user = await User.findById(request.params.id).populate({
+    path: "blogs",
+    model: "Blog",
+  });
   response.json(user);
 });
 

@@ -13,11 +13,13 @@ const api = supertest(app);
 // - invalid add user operation returns a suitable status code error message
 
 beforeEach(async () => {
-  await User.deleteMany({});
+  // await User.deleteMany({});
 });
 
 describe("creating users", () => {
   test("invalid user won't be created", async () => {
+    const startingUsers = await api.get("/api/users");
+
     const request = await api.post("/api/users").send({
       username: "Test123",
       name: "John",
@@ -27,7 +29,7 @@ describe("creating users", () => {
 
     // Check that no new user was created.
     const users = await api.get("/api/users");
-    expect(users.body).toHaveLength(0);
+    expect(users.body).toHaveLength(startingUsers.body.length);
   });
 
   test("invalid add user operation returns a suitable status code error message", async () => {
