@@ -29,6 +29,7 @@ app.use(express.static("build"));
 app.use(cors());
 app.use(express.json());
 app.use(middleware.logger);
+app.use(middleware.token);
 app.use("/api/blogs", blogs);
 app.use("/api/users", users);
 app.use("/api/login", login);
