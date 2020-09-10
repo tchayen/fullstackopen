@@ -60,7 +60,14 @@ describe("blogs", () => {
   });
 
   test("creation of a new post is possible", async () => {
-    // TODO
+    await api.post("/api/blogs").send({
+      title: "New blog",
+      author: "Me",
+      url: "http://localhost:1234/new-blog",
+    });
+
+    const count = await Blog.countDocuments({});
+    expect(count).toBe(4);
   });
 
   test("creating a post and ommiting the like field makes it a default 0", async () => {
