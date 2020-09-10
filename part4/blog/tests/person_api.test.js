@@ -46,13 +46,13 @@ describe("blogs", () => {
 
   test("there is a proper number of blogs returned", async () => {
     const response = await api.get("/api/blogs");
-    const blogs = JSON.parse(response.text);
+    const blogs = response.body;
     expect(blogs).toHaveLength(3);
   });
 
   test("each blog has an ID defined", async () => {
     const response = await api.get("/api/blogs");
-    const blogs = JSON.parse(response.text);
+    const blogs = response.body;
 
     blogs.forEach((blog) => {
       expect(blog.id).toBeDefined();
@@ -71,11 +71,24 @@ describe("blogs", () => {
   });
 
   test("creating a post and ommiting the like field makes it a default 0", async () => {
-    // TODO
+    const result = await api.post("/api/blogs").send({
+      title: "New blog",
+      author: "Me",
+      url: "http://localhost:1234/new-blog",
+    });
+    const blog = result.body;
+
+    expect(blog.likes).toBeDefined();
+    expect(blog.likes).toBe(0);
   });
 
   test("creating a post and ommiting either title or URL gives response with HTTP 400", async () => {
-    // TODO
+    const result = await api.post("/api/blogs").send({
+      author: "Me",
+      url: "http://localhost:1234/new-blog",
+    });
+
+    expect(result.status).toBe(400);
   });
 });
 
