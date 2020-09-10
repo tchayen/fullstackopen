@@ -31,13 +31,10 @@ beforeEach(async () => {
   await Promise.all(
     initialBlogs.map((blog) => new Blog(blog)).map((blog) => blog.save())
   );
-
-  // TODO:
-  // - fix the first test to actually expect a proper count of those
 });
 
 describe("blogs", () => {
-  test("blogs are returned as JSON", async () => {
+  test("are returned as JSON", async () => {
     await api
       .get("/api/blogs")
       .expect(200)
@@ -58,8 +55,10 @@ describe("blogs", () => {
       expect(blog.id).toBeDefined();
     });
   });
+});
 
-  test("creation of a new post is possible", async () => {
+describe("creating a post", () => {
+  test("is possible", async () => {
     await api.post("/api/blogs").send({
       title: "New blog",
       author: "Me",
@@ -70,7 +69,7 @@ describe("blogs", () => {
     expect(count).toBe(4);
   });
 
-  test("creating a post and ommiting the like field makes it a default 0", async () => {
+  test("and ommiting the like field makes it a default 0", async () => {
     const result = await api.post("/api/blogs").send({
       title: "New blog",
       author: "Me",
@@ -82,13 +81,23 @@ describe("blogs", () => {
     expect(blog.likes).toBe(0);
   });
 
-  test("creating a post and ommiting either title or URL gives response with HTTP 400", async () => {
+  test("and ommiting either title or URL gives response with HTTP 400", async () => {
     const result = await api.post("/api/blogs").send({
       author: "Me",
       url: "http://localhost:1234/new-blog",
     });
 
     expect(result.status).toBe(400);
+  });
+});
+
+describe("removing a post", () => {
+  test("works", async () => {
+    const response = await api.get("/api/blogs");
+    const blogs = response.body;
+
+    const result = await api.delete(`/api/blogs/${blogs[0].id}`);
+    expect(result.status).toBe(204);
   });
 });
 

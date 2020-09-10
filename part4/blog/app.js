@@ -1,7 +1,7 @@
 const config = require("./utils/config");
 const mongoose = require("mongoose");
 const express = require("express");
-// require("express-async-errors");
+require("express-async-errors");
 const cors = require("cors");
 const middleware = require("./utils/middleware");
 const blogs = require("./controllers/blogs");
