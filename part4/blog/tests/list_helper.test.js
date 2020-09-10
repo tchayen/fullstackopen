@@ -120,7 +120,7 @@ describe("favoriteBlog", () => {
   });
 });
 
-describe("most blogs", () => {
+describe("mostBlogs", () => {
   test("returns undefined for an empty list", () => {
     const result = listHelper.mostBlogs(emptyBlogList);
     expect(result).toBe(undefined);
@@ -134,5 +134,22 @@ describe("most blogs", () => {
   test("returns proper author of a longer", () => {
     const result = listHelper.mostBlogs(longBlogList);
     expect(result).toEqual({ author: "Robert C. Martin", blogs: 3 });
+  });
+});
+
+describe("mostLikes", () => {
+  test("returns undefined for an empty list", () => {
+    const result = listHelper.mostLikes(emptyBlogList);
+    expect(result).toBe(undefined);
+  });
+
+  test("returns the only author of a one-element list", () => {
+    const result = listHelper.mostLikes(singleBlog);
+    expect(result).toEqual({ author: "Edsger W. Dijkstra", likes: 5 });
+  });
+
+  test("returns proper author of a longer", () => {
+    const result = listHelper.mostLikes(longBlogList);
+    expect(result).toEqual({ author: "Edsger W. Dijkstra", likes: 17 });
   });
 });
