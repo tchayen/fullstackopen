@@ -141,7 +141,6 @@ describe("removing a post", () => {
     const response = await api.get("/api/blogs");
     const blogs = response.body;
 
-    console.log({ token });
     const result = await api
       .delete(`/api/blogs/${blogs[0].id}`)
       .set("Authorization", `Bearer ${token}`);
@@ -153,7 +152,6 @@ describe("removing a post", () => {
     const response = await api.get("/api/blogs");
     const blogs = response.body;
 
-    console.log({ token });
     const result = await api.delete(`/api/blogs/${blogs[0].id}`);
 
     expect(result.status).toBe(401);

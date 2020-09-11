@@ -30,8 +30,6 @@ app.post("/", async (request, response) => {
   user.blogs = user.blogs.concat(result.id);
   await user.save();
 
-  console.log("user", user.id, "blog", result.id);
-
   response.status(201).json(result);
 });
 
