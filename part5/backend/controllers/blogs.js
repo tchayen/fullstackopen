@@ -35,7 +35,10 @@ app.post("/", async (request, response) => {
 
 app.put("/:id", async (request, response) => {
   await Blog.findByIdAndUpdate(request.params.id, request.body);
-  const blog = await Blog.findById(request.params.id);
+  const blog = await Blog.findById(request.params.id).populate("author", {
+    username: 1,
+    name: 1,
+  });
   response.status(200).json(blog);
 });
 

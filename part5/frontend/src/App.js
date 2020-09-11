@@ -39,6 +39,18 @@ const api = {
 
       return await response.json();
     },
+    update: async (token, blog) => {
+      const response = await fetch(`/api/blogs/${blog.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(blog),
+      });
+
+      return await response.json();
+    },
   },
 };
 
@@ -127,13 +139,57 @@ const AddBlog = ({ onAddBlog, token }) => {
   );
 };
 
-const Blogs = ({ blogs }) => {
+const Blog = ({ blog, updateBlog }) => {
+  const [show, setShow] = useState(false);
+
+  const onLike = () => {
+    updateBlog(blog.id, {
+      ...blog,
+      likes: blog.likes + 1,
+      author: blog.author.id,
+    });
+  };
+
+  return (
+    <div
+      style={{
+        border: "1px solid #eee",
+        padding: 16,
+        borderRadius: 8,
+        marginBottom: 12,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <strong>{blog.title}</strong>{" "}
+        <button onClick={() => setShow(!show)} style={{ marginLeft: 12 }}>
+          View
+        </button>
+      </div>
+      {show && (
+        <div>
+          <p>
+            <strong>Likes:</strong> {blog.likes}
+          </p>
+          <p>
+            <strong>URL:</strong> {blog.url}
+          </p>
+          <p>
+            <strong>Author:</strong> {blog.author.name}
+          </p>
+          <button onClick={onLike}>Like</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Blogs = ({ blogs, updateBlog }) => {
   return (
     <div style={{ marginTop: 16, marginBottom: 16 }}>
       {blogs.map((blog) => (
-        <div key={blog.id}>
-          <strong>{blog.title}</strong> {blog.author.name}
-        </div>
+        <Blog blog={blog} key={blog.id} updateBlog={updateBlog} />
       ))}
     </div>
   );
@@ -145,8 +201,10 @@ const App = () => {
   const [blogs, setBlogs] = useState([]);
   const timeout = useRef(null);
 
+  const byLikes = (a, b) => b.likes - a.likes;
+
   useEffect(() => {
-    api.blogs.all().then(setBlogs);
+    api.blogs.all().then((blogs) => setBlogs(blogs.sort(byLikes)));
   }, []);
 
   const setError = (message) => {
@@ -163,6 +221,13 @@ const App = () => {
     timeout.current = setTimeout(() => {
       setPopup(null);
     }, NOTICE_TIME);
+  };
+
+  const updateBlog = async (id, blog) => {
+    const updated = await api.blogs.update(session.token, blog);
+    setBlogs(
+      [...blogs.filter((blog) => blog.id !== id), updated].sort(byLikes)
+    );
   };
 
   useEffect(() => {
@@ -202,7 +267,7 @@ const App = () => {
         {popup && <Popup message={popup.message} error={popup.error} />}
         <div style={{ padding: 32 }}>
           <button onClick={logout}>Log out</button>
-          <Blogs blogs={blogs} />
+          <Blogs updateBlog={updateBlog} blogs={blogs} />
           <AddBlog token={session.token} onAddBlog={onAddBlog} />
         </div>
       </div>
