@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 const api = {
   login: async (username, password) => {
@@ -85,7 +85,7 @@ const Login = ({ onLogin, setError, setNotice }) => {
   );
 };
 
-const AddBlog = () => {
+const AddBlog = ({ onAddBlog, token }) => {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
 
@@ -97,8 +97,13 @@ const AddBlog = () => {
     setUrl(event.target.value);
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
+
+    await api.blogs.create(token, url, title);
+    setTitle("");
+    setUrl("");
+    onAddBlog();
   };
 
   return (
@@ -110,13 +115,7 @@ const AddBlog = () => {
   );
 };
 
-const Blogs = () => {
-  const [blogs, setBlogs] = useState([]);
-
-  useEffect(() => {
-    api.blogs.all().then(setBlogs);
-  }, []);
-
+const Blogs = ({ blogs }) => {
   return (
     <div style={{ marginTop: 16, marginBottom: 16 }}>
       {blogs.map((blog) => (
@@ -131,17 +130,25 @@ const Blogs = () => {
 const App = () => {
   const [session, setSession] = useState({ state: "loading" });
   const [popup, setPopup] = useState(null);
+  const [blogs, setBlogs] = useState([]);
+  const timeout = useRef(null);
+
+  useEffect(() => {
+    api.blogs.all().then(setBlogs);
+  }, []);
 
   const setError = (message) => {
     setPopup({ error: true, message });
-    setTimeout(() => {
+    clearTimeout(timeout.current);
+    timeout.current = setTimeout(() => {
       setPopup(null);
     }, NOTICE_TIME);
   };
 
   const setNotice = (message) => {
     setPopup({ error: false, message });
-    setTimeout(() => {
+    clearTimeout(timeout.current);
+    timeout.current = setTimeout(() => {
       setPopup(null);
     }, NOTICE_TIME);
   };
@@ -164,6 +171,13 @@ const App = () => {
   const logout = () => {
     localStorage.removeItem("token");
     setSession({ state: "not-signed-in" });
+    setNotice("You have been logged out");
+  };
+
+  const onAddBlog = async () => {
+    const blogs = await api.blogs.all();
+    setBlogs(blogs);
+    setNotice("Added blog post");
   };
 
   if (session.state === "loading") {
@@ -176,8 +190,8 @@ const App = () => {
         {popup && <Popup message={popup.message} error={popup.error} />}
         <div style={{ padding: 32 }}>
           <button onClick={logout}>Log out</button>
-          <Blogs />
-          <AddBlog />
+          <Blogs blogs={blogs} />
+          <AddBlog token={session.token} onAddBlog={onAddBlog} />
         </div>
       </div>
     );
