@@ -49,6 +49,7 @@ const Popup = ({ message, error }) => (
 );
 
 const Login = ({ onLogin, setError, setNotice }) => {
+  const [show, setShow] = useState(false);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
 
@@ -71,6 +72,10 @@ const Login = ({ onLogin, setError, setNotice }) => {
     }
   };
 
+  if (!show) {
+    return <button onClick={() => setShow(true)}>Log in</button>;
+  }
+
   return (
     <form onSubmit={onSubmit} style={{ padding: 32 }}>
       <input placeholder="Username" onChange={onLoginChange} value={login} />
@@ -81,11 +86,13 @@ const Login = ({ onLogin, setError, setNotice }) => {
         value={password}
       />
       <button type="submit">Login</button>
+      <button onClick={() => setShow(false)}>Cancel</button>
     </form>
   );
 };
 
 const AddBlog = ({ onAddBlog, token }) => {
+  const [show, setShow] = useState(false);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
 
@@ -106,11 +113,16 @@ const AddBlog = ({ onAddBlog, token }) => {
     onAddBlog();
   };
 
+  if (!show) {
+    return <button onClick={() => setShow(true)}>Add blog</button>;
+  }
+
   return (
     <form onSubmit={onSubmit}>
       <input placeholder="Title" onChange={onTitleChange} value={title} />
       <input placeholder="Url" onChange={onUrlChange} value={url} />
       <button type="submit">Add</button>
+      <button onClick={() => setShow(false)}>Cancel</button>
     </form>
   );
 };
