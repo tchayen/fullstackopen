@@ -51,6 +51,14 @@ const api = {
 
       return await response.json();
     },
+    delete: async (token, id) => {
+      return await fetch(`/api/blogs/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
   },
 };
 
@@ -77,7 +85,7 @@ const Login = ({ onLogin, setError, setNotice }) => {
     event.preventDefault();
     try {
       const response = await api.login(login, password);
-      onLogin(response.token);
+      onLogin(response);
       setNotice("Signed in");
     } catch (error) {
       setError("Couldn't sign in");
@@ -139,7 +147,7 @@ const AddBlog = ({ onAddBlog, token }) => {
   );
 };
 
-const Blog = ({ blog, updateBlog }) => {
+const Blog = ({ blog, updateBlog, deleteBlog, currentUser }) => {
   const [show, setShow] = useState(false);
 
   const onLike = () => {
@@ -148,6 +156,10 @@ const Blog = ({ blog, updateBlog }) => {
       likes: blog.likes + 1,
       author: blog.author.id,
     });
+  };
+
+  const onDelete = () => {
+    deleteBlog(blog.id);
   };
 
   return (
@@ -179,17 +191,28 @@ const Blog = ({ blog, updateBlog }) => {
             <strong>Author:</strong> {blog.author.name}
           </p>
           <button onClick={onLike}>Like</button>
+          {blog.author.username === currentUser.username && (
+            <button style={{ marginLeft: 12 }} onClick={onDelete}>
+              Delete
+            </button>
+          )}
         </div>
       )}
     </div>
   );
 };
 
-const Blogs = ({ blogs, updateBlog }) => {
+const Blogs = ({ blogs, updateBlog, deleteBlog, currentUser }) => {
   return (
     <div style={{ marginTop: 16, marginBottom: 16 }}>
       {blogs.map((blog) => (
-        <Blog blog={blog} key={blog.id} updateBlog={updateBlog} />
+        <Blog
+          blog={blog}
+          key={blog.id}
+          deleteBlog={deleteBlog}
+          updateBlog={updateBlog}
+          currentUser={currentUser}
+        />
       ))}
     </div>
   );
@@ -230,23 +253,31 @@ const App = () => {
     );
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  const deleteBlog = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this blog?")) {
+      return;
+    }
+    await api.blogs.delete(session.data.token, id);
+    setBlogs([...blogs.filter((blog) => blog.id !== id)].sort(byLikes));
+  };
 
-    if (token) {
-      setSession({ state: "signed-in", token });
+  useEffect(() => {
+    const data = localStorage.getItem("data");
+
+    if (data) {
+      setSession({ state: "signed-in", data: JSON.parse(data) });
     } else {
       setSession({ state: "not-signed-in" });
     }
   }, []);
 
-  const onLogin = (token) => {
-    localStorage.setItem("token", token);
-    setSession({ state: "signed-in", token });
+  const onLogin = (data) => {
+    localStorage.setItem("data", JSON.stringify(data));
+    setSession({ state: "signed-in", data });
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("data");
     setSession({ state: "not-signed-in" });
     setNotice("You have been logged out");
   };
@@ -267,8 +298,13 @@ const App = () => {
         {popup && <Popup message={popup.message} error={popup.error} />}
         <div style={{ padding: 32 }}>
           <button onClick={logout}>Log out</button>
-          <Blogs updateBlog={updateBlog} blogs={blogs} />
-          <AddBlog token={session.token} onAddBlog={onAddBlog} />
+          <Blogs
+            deleteBlog={deleteBlog}
+            updateBlog={updateBlog}
+            blogs={blogs}
+            currentUser={session.data}
+          />
+          <AddBlog token={session.data.token} onAddBlog={onAddBlog} />
         </div>
       </div>
     );
