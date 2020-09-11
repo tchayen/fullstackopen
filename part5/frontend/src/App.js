@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 const api = {
   login: async (username, password) => {
@@ -200,6 +201,13 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentUser }) => {
       )}
     </div>
   );
+};
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  updateBlog: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired,
+  currentUser: PropTypes.object.isRequired,
 };
 
 const Blogs = ({ blogs, updateBlog, deleteBlog, currentUser }) => {
