@@ -11,7 +11,7 @@ const api = supertest(app);
 const initialUser = {
   username: "test",
   name: "John",
-  passwordHash: "---",
+  password: "hunter8",
 };
 
 const initialBlogs = [
@@ -31,11 +31,16 @@ const initialBlogs = [
 ];
 
 let user = null;
+let token = null;
+
 beforeAll(async () => {
   await User.deleteMany({});
-  user = new User(initialUser);
-  await user.save();
-  console.log(await User.find({}));
+  const createUser = await api.post("/api/users").send(initialUser);
+  user = createUser.body;
+  const response = await api
+    .post("/api/login")
+    .send({ username: initialUser.username, password: initialUser.password });
+  token = response.body.token;
 });
 
 beforeEach(async () => {
@@ -74,22 +79,44 @@ describe("blogs", () => {
 
 describe("creating a post", () => {
   test("is possible", async () => {
-    await api.post("/api/blogs").send({
-      title: "New blog",
-      author: user.id,
-      url: "http://localhost:1234/new-blog",
-    });
+    const response = await api
+      .post("/api/blogs")
+      .send({
+        title: "New blog",
+        author: user.id,
+        url: "http://localhost:1234/new-blog",
+      })
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.status).toBe(201);
 
     const count = await Blog.countDocuments({});
     expect(count).toBe(4);
   });
 
-  test("and ommiting the like field makes it a default 0", async () => {
-    const result = await api.post("/api/blogs").send({
+  test("is not possible without token", async () => {
+    const response = await api.post("/api/blogs").send({
       title: "New blog",
       author: user.id,
       url: "http://localhost:1234/new-blog",
     });
+
+    expect(response.status).toBe(401);
+
+    const count = await Blog.countDocuments({});
+    expect(count).toBe(3);
+  });
+
+  test("and ommiting the like field makes it a default 0", async () => {
+    const result = await api
+      .post("/api/blogs")
+      .send({
+        title: "New blog",
+        author: user.id,
+        url: "http://localhost:1234/new-blog",
+      })
+      .set("Authorization", `Bearer ${token}`);
+
     const blog = result.body;
 
     expect(blog.likes).toBeDefined();
@@ -97,10 +124,13 @@ describe("creating a post", () => {
   });
 
   test("and ommiting either title or URL gives response with HTTP 400", async () => {
-    const result = await api.post("/api/blogs").send({
-      author: user.id,
-      url: "http://localhost:1234/new-blog",
-    });
+    const result = await api
+      .post("/api/blogs")
+      .send({
+        author: user.id,
+        url: "http://localhost:1234/new-blog",
+      })
+      .set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(400);
   });
@@ -111,8 +141,22 @@ describe("removing a post", () => {
     const response = await api.get("/api/blogs");
     const blogs = response.body;
 
-    const result = await api.delete(`/api/blogs/${blogs[0].id}`);
+    console.log({ token });
+    const result = await api
+      .delete(`/api/blogs/${blogs[0].id}`)
+      .set("Authorization", `Bearer ${token}`);
+
     expect(result.status).toBe(204);
+  });
+
+  test("doesn't work for not logged in", async () => {
+    const response = await api.get("/api/blogs");
+    const blogs = response.body;
+
+    console.log({ token });
+    const result = await api.delete(`/api/blogs/${blogs[0].id}`);
+
+    expect(result.status).toBe(401);
   });
 });
 
