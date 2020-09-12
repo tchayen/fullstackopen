@@ -31,8 +31,14 @@ const Login = ({ onLogin, setError, setNotice }) => {
 
   return (
     <form onSubmit={onSubmit} style={{ padding: 32 }}>
-      <input placeholder="Username" onChange={onLoginChange} value={login} />
       <input
+        id="login"
+        placeholder="Username"
+        onChange={onLoginChange}
+        value={login}
+      />
+      <input
+        id="password"
         placeholder="Password"
         type="password"
         onChange={onPasswordChange}
