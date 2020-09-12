@@ -1,230 +1,14 @@
 import React, { useRef, useEffect, useState } from "react";
-import PropTypes from "prop-types";
-
-const api = {
-  login: async (username, password) => {
-    const response = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
-
-    if (response.status === 401) {
-      throw new Error("Denied");
-    }
-
-    return await response.json();
-  },
-  blogs: {
-    all: async () => {
-      const response = await fetch("/api/blogs", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      return await response.json();
-    },
-    create: async (token, url, title) => {
-      const response = await fetch("/api/blogs", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ url, title }),
-      });
-
-      return await response.json();
-    },
-    update: async (token, blog) => {
-      const response = await fetch(`/api/blogs/${blog.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(blog),
-      });
-
-      return await response.json();
-    },
-    delete: async (token, id) => {
-      return await fetch(`/api/blogs/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    },
-  },
-};
+import Login from "./Login";
+import AddBlog from "./AddBlog";
+import Blogs from "./Blogs";
+import api from "./api";
 
 const NOTICE_TIME = 3000;
 
 const Popup = ({ message, error }) => (
   <div className={`popup${error ? " error" : ""}`}>{message}</div>
 );
-
-const Login = ({ onLogin, setError, setNotice }) => {
-  const [show, setShow] = useState(false);
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-
-  const onLoginChange = (event) => {
-    setLogin(event.target.value);
-  };
-
-  const onPasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
-
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const response = await api.login(login, password);
-      onLogin(response);
-      setNotice("Signed in");
-    } catch (error) {
-      setError("Couldn't sign in");
-    }
-  };
-
-  if (!show) {
-    return <button onClick={() => setShow(true)}>Log in</button>;
-  }
-
-  return (
-    <form onSubmit={onSubmit} style={{ padding: 32 }}>
-      <input placeholder="Username" onChange={onLoginChange} value={login} />
-      <input
-        placeholder="Password"
-        type="password"
-        onChange={onPasswordChange}
-        value={password}
-      />
-      <button type="submit">Login</button>
-      <button onClick={() => setShow(false)}>Cancel</button>
-    </form>
-  );
-};
-
-const AddBlog = ({ onAddBlog, token }) => {
-  const [show, setShow] = useState(false);
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
-
-  const onTitleChange = (event) => {
-    setTitle(event.target.value);
-  };
-
-  const onUrlChange = (event) => {
-    setUrl(event.target.value);
-  };
-
-  const onSubmit = async (event) => {
-    event.preventDefault();
-
-    await api.blogs.create(token, url, title);
-    setTitle("");
-    setUrl("");
-    onAddBlog();
-  };
-
-  if (!show) {
-    return <button onClick={() => setShow(true)}>Add blog</button>;
-  }
-
-  return (
-    <form onSubmit={onSubmit}>
-      <input placeholder="Title" onChange={onTitleChange} value={title} />
-      <input placeholder="Url" onChange={onUrlChange} value={url} />
-      <button type="submit">Add</button>
-      <button onClick={() => setShow(false)}>Cancel</button>
-    </form>
-  );
-};
-
-const Blog = ({ blog, updateBlog, deleteBlog, currentUser }) => {
-  const [show, setShow] = useState(false);
-
-  const onLike = () => {
-    updateBlog(blog.id, {
-      ...blog,
-      likes: blog.likes + 1,
-      author: blog.author.id,
-    });
-  };
-
-  const onDelete = () => {
-    deleteBlog(blog.id);
-  };
-
-  return (
-    <div
-      style={{
-        border: "1px solid #eee",
-        padding: 16,
-        borderRadius: 8,
-        marginBottom: 12,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <strong>{blog.title}</strong>{" "}
-        <button onClick={() => setShow(!show)} style={{ marginLeft: 12 }}>
-          View
-        </button>
-      </div>
-      {show && (
-        <div>
-          <p>
-            <strong>Likes:</strong> {blog.likes}
-          </p>
-          <p>
-            <strong>URL:</strong> {blog.url}
-          </p>
-          <p>
-            <strong>Author:</strong> {blog.author.name}
-          </p>
-          <button onClick={onLike}>Like</button>
-          {blog.author.username === currentUser.username && (
-            <button style={{ marginLeft: 12 }} onClick={onDelete}>
-              Delete
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  updateBlog: PropTypes.func.isRequired,
-  deleteBlog: PropTypes.func.isRequired,
-  currentUser: PropTypes.object.isRequired,
-};
-
-const Blogs = ({ blogs, updateBlog, deleteBlog, currentUser }) => {
-  return (
-    <div style={{ marginTop: 16, marginBottom: 16 }}>
-      {blogs.map((blog) => (
-        <Blog
-          blog={blog}
-          key={blog.id}
-          deleteBlog={deleteBlog}
-          updateBlog={updateBlog}
-          currentUser={currentUser}
-        />
-      ))}
-    </div>
-  );
-};
 
 const App = () => {
   const [session, setSession] = useState({ state: "loading" });
@@ -290,7 +74,8 @@ const App = () => {
     setNotice("You have been logged out");
   };
 
-  const onAddBlog = async () => {
+  const onAddBlog = async ({ url, title }) => {
+    await api.blogs.create(session.data.token, url, title);
     const blogs = await api.blogs.all();
     setBlogs(blogs);
     setNotice("Added blog post");
@@ -312,7 +97,7 @@ const App = () => {
             blogs={blogs}
             currentUser={session.data}
           />
-          <AddBlog token={session.data.token} onAddBlog={onAddBlog} />
+          <AddBlog onAddBlog={onAddBlog} />
         </div>
       </div>
     );
