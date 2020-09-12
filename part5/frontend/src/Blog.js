@@ -18,6 +18,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentUser }) => {
 
   return (
     <div
+      className="blog"
       style={{
         border: "1px solid #eee",
         padding: 16,

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import api from "./api";
 
 const AddBlog = ({ onAddBlog }) => {
   const [show, setShow] = useState(false);
