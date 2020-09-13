@@ -16,6 +16,7 @@ const AnecdoteForm = () => {
       dispatch(set(""));
     }, 5000);
   };
+
   return (
     <>
       <h2>create new</h2>
