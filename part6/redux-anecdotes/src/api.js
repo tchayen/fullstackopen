@@ -10,4 +10,10 @@ export default {
       votes: 0,
     });
   },
+  update: async (anecdote) => {
+    return await axios.put(
+      `http://localhost:3001/anecdotes/${anecdote.id}`,
+      anecdote
+    );
+  },
 };

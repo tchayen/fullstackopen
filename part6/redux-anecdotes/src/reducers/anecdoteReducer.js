@@ -12,11 +12,12 @@ const asObject = (anecdote) => {
   };
 };
 
-export const vote = (id) => {
-  return {
+export const vote = (anecdote) => async (dispatch) => {
+  dispatch({
     type: "VOTE",
-    id,
-  };
+    id: anecdote.id,
+  });
+  await api.update({ ...anecdote, votes: anecdote.votes + 1 });
 };
 
 export const create = ({ content }) => async (dispatch) => {

@@ -11,7 +11,7 @@ const AnecdoteList = () => {
   const byVotes = (a, b) => b.votes - a.votes;
 
   const onVote = (anecdote) => {
-    dispatch(vote(anecdote.id));
+    dispatch(vote(anecdote));
     dispatch(set(`You voted for: '${anecdote.content}'`, 3));
   };
 
