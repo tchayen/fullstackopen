@@ -1,13 +1,22 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, connect } from "react-redux";
 import { filter } from "../reducers/filterReducer";
 
-const Filter = () => {
-  const filterValue = useSelector((state) => state.filter);
-  const dispatch = useDispatch();
+const mapStateToProps = (state) => {
+  return {
+    filterValue: state.filter,
+  };
+};
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    filter: (text) => dispatch(filter(text)),
+  };
+};
+
+const Filter = ({ filterValue, filter }) => {
   const onChange = (event) => {
-    dispatch(filter(event.target.value));
+    filter(event.target.value);
   };
 
   return (
@@ -17,4 +26,4 @@ const Filter = () => {
   );
 };
 
-export default Filter;
+export default connect(mapStateToProps, mapDispatchToProps)(Filter);
