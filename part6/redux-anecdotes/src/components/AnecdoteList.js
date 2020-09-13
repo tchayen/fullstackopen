@@ -1,5 +1,5 @@
 import React from "react";
-import { connect, useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { vote } from "../reducers/anecdoteReducer";
 import { set } from "../reducers/notificationReducer";
 import Filter from "./Filter";
@@ -18,7 +18,7 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-const AnecdoteList = ({ anecdotes, filter }) => {
+const AnecdoteList = ({ anecdotes, filter, vote, set }) => {
   const byVotes = (a, b) => b.votes - a.votes;
 
   const onVote = (anecdote) => {
@@ -48,4 +48,4 @@ const AnecdoteList = ({ anecdotes, filter }) => {
   );
 };
 
-export default connect(mapStateToProps)(AnecdoteList);
+export default connect(mapStateToProps, mapDispatchToProps)(AnecdoteList);
